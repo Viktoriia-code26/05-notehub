@@ -6,7 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
 import Pagination from "../Pagination/Pagination";
-import NoteModal from "../NoteModal/NoteModal";
+import NoteModal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 
 import { deleteNote, fetchNotes} from "../../services/noteServices";
