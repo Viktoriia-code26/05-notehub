@@ -9,7 +9,8 @@ interface NoteProps{
   onDelete: (id: string) => void;
 }
 
-export default function NoteList({ notes }: NoteProps) {
+export default function NoteList({ notes, onSelect }: NoteProps) {
+
   const quertClient = useQueryClient();
 
   const deleteNoteMutation = useMutation({
@@ -39,12 +40,14 @@ export default function NoteList({ notes }: NoteProps) {
 
     })
   }
-
+ if (!notes?.length) {
+    return <p>No notes found</p>;
+  }
 
   return (
     <ul className={css.list}>
       {notes.map((note) => (
-        <li key={note.id} className={css.listItem}>
+        <li key={note.id} className={css.listItem} onClick={() => onSelect(note)}>
           <input
             type="checkbox"
             defaultChecked={!note.content}

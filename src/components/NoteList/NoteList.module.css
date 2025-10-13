@@ -33,9 +33,9 @@
     color: #495057;
     margin-bottom: 12px;
     display: -webkit-box;
-    /* -webkit-line-clamp: 3;
+    /* -webkit-line-clamp: 3; */
     -webkit-box-orient: vertical;
-    overflow: hidden; */
+    overflow: hidden;
 }
 
 .button {
@@ -71,6 +71,6 @@
     border-radius: 12px;
     max-width: 100px;
     white-space: nowrap;
-    /* overflow: hidden; */
+    overflow: hidden;
     text-overflow: ellipsis;
 }

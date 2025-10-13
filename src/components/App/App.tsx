@@ -10,8 +10,10 @@ import NoteModal from "../NoteModal/NoteModal";
 import NoteForm from "../NoteForm/NoteForm";
 
 import { deleteNote, fetchNotes} from "../../services/noteServices";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import type { Note } from "../../types/note";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 
 const useToggle = () => {
@@ -26,26 +28,21 @@ const useToggle = () => {
 export default function App() {
   const queryClient = useQueryClient();
   const { isOpen, open, close } = useToggle();
-
-  const [searchQuery, setSearchQuery] = useState("");
+  const [ searchTerm, setSearchTerm ] = useState<string>("");
+  const [debouncedSearch] = useDebounce(searchTerm, 600);
+  // const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-
-  const handleSearch = useDebouncedCallback((q: string) => {
-    setSearchQuery(q);
-    setCurrentPage(1);
-  }, 600);
-
   const { data, isLoading, error, isFetching } = useQuery({
-    queryKey: ["notes", searchQuery, currentPage],
-    queryFn: () => fetchNotes({ query: searchQuery, currentPage }),
+    queryKey: ["notes", debouncedSearch, currentPage],
+    queryFn: () => fetchNotes({ query: debouncedSearch, currentPage }),
     placeholderData: keepPreviousData,
-    enabled: true,
   });
 
   const notes = data?.results ?? [];
   const totalPages = data?.total_pages ?? 1;
 
+  
   const deleteNoteMutation = useMutation({
     mutationFn: deleteNote,
     onSuccess: () => {
@@ -63,35 +60,40 @@ export default function App() {
   const handleSelectNote = (note: Note) => {
     console.log("Selected note:", note);
   };
+
+//  const handleSearch = useDebouncedCallback((q: string) => {
+//     setSearchQuery(q);
+//     setCurrentPage(1);
+//   }, 600);
+
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
      
-        <SearchBox onSearch={handleSearch} searchQuery={searchQuery} />
-        <button className={css.createButton} onClick={open}>
+        <SearchBox onSearch={setSearchTerm} searchQuery={searchTerm} />
+        
+         { totalPages > 1 && notes.length > 0 && (
+          <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onPageChange={(page) => setCurrentPage(page)}
+            />
+)}
+        <button className={css.button} onClick={open}>
           + Create Note
         </button>
       </header>
 
       <main className={css.main}>
-        {(isLoading || isFetching) && <strong className={css.loading}>Loading notes...</strong>}
-        {error && <p className={css.error}>❌ Failed to load notes.</p>}
+        {(isLoading || isFetching) && <Loader/>}
+        {error && <ErrorMessage/>}
 
         {!isLoading && notes.length > 0 ? (
-          <>
+        
             <NoteList notes={notes}
               onSelect={handleSelectNote}
               onDelete={handleDeleteNote} />
-           
-            {totalPages > 1 && (
-                 <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-            />
-)}
-         
-          </>
         ) : (
           !isLoading && <p className={css.empty}>No notes found.</p>
         )}

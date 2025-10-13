@@ -6,10 +6,14 @@ export interface NoteHttpResponse {
   page: number;
   total_pages: number;
   total_results: number;
+  query?: string;
+  currentPage?: number;
+  perPage?: number;
 }
 
+
 const token = import.meta.env.VITE_NOTEHUB_TOKEN;
-const BASE_URL = "https://notehub-public.goit.study/api/docs/notes";
+const BASE_URL = "https://notehub-public.goit.study/api/notes";
 
 
 export async function fetchNotes({
@@ -17,21 +21,33 @@ export async function fetchNotes({
   currentPage = 1,
 }: {
   query?: string;
-  currentPage?: number;
+    currentPage?: number;
 }): Promise<NoteHttpResponse> {
   try {
-    const response = await axios.get<NoteHttpResponse>(BASE_URL, {
+    const response = await axios.get(BASE_URL, {
       params: {
-        q: query || undefined,
+        search: query || undefined,
         page: currentPage,
-        perPage: 10,
+        perPage: 12,
       },
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
+        "Cache-Control": "no-cashe",
       },
     });
-    return response.data;
+    const apiData = response.data;
+    console.log("Fetched notes:", apiData);
+
+    return {
+      results: apiData.notes || [],
+      page: currentPage,
+      total_pages: apiData.totalPages || apiData.total_pages || 1,
+      total_results:
+        apiData.totalResults ||
+        apiData.total_results ||
+        apiData.notes?.length || 0,
+    };
   } catch (error) {
     console.error("❌ Error fetching notes:", error);
     return {
