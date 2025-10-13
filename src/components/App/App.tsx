@@ -9,7 +9,7 @@ import Pagination from "../Pagination/Pagination";
 import NoteModal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 
-import { deleteNote, fetchNotes} from "../../services/noteServices";
+import { deleteNote, fetchNotes} from "../../services/noteService";
 import { useDebounce } from "use-debounce";
 import type { Note } from "../../types/note";
 import Loader from "../Loader/Loader";
