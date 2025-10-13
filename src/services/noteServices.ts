@@ -37,7 +37,6 @@ export async function fetchNotes({
       },
     });
     const apiData = response.data;
-    console.log("Fetched notes:", apiData);
 
     return {
       results: apiData.notes || [],

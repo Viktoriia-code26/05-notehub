@@ -26,11 +26,11 @@ const useToggle = () => {
 };
 
 export default function App() {
+
   const queryClient = useQueryClient();
   const { isOpen, open, close } = useToggle();
   const [ searchTerm, setSearchTerm ] = useState<string>("");
   const [debouncedSearch] = useDebounce(searchTerm, 600);
-  // const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error, isFetching } = useQuery({
@@ -60,11 +60,6 @@ export default function App() {
   const handleSelectNote = (note: Note) => {
     console.log("Selected note:", note);
   };
-
-//  const handleSearch = useDebouncedCallback((q: string) => {
-//     setSearchQuery(q);
-//     setCurrentPage(1);
-//   }, 600);
 
 
   return (
