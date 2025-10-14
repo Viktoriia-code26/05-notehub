@@ -5,9 +5,10 @@ import React, { useEffect} from "react";
 interface ModalProps{
   onClose: () => void;
   children: React.ReactNode;
+  open: boolean;
 }
 
-export default function NoteModal({onClose, children}: ModalProps){
+export default function NoteModal({onClose, children, open}: ModalProps){
   const handleBackdropClick = (event: React.MouseEvent<HTMLDivElement>) => {
   if (event.target === event.currentTarget) {
     onClose();
@@ -31,7 +32,7 @@ export default function NoteModal({onClose, children}: ModalProps){
       document.removeEventListener("keydown", handleKeyDown)
       document.body.style.overflow = originalStyle;
     };
-    }, [onClose]);
+    }, [open, onClose]);
   
   if (!open) return null;
 

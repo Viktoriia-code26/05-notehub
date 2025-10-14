@@ -14,7 +14,6 @@ export default function SearchBox({ onSearch, searchQuery }: SearchBoxProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
           <input
             className={styles.input}
             type="text"
@@ -23,9 +22,8 @@ export default function SearchBox({ onSearch, searchQuery }: SearchBoxProps) {
             placeholder="Search notes..."
             autoFocus
             value={searchQuery}
-            onChange={handleChange}
-          />
-        </form>
+          onChange={handleChange}
+        />
       </div>
     </header>
   );

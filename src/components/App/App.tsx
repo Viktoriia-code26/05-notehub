@@ -1,7 +1,7 @@
 import css from "../App/App.module.css";
-import { useQuery, keepPreviousData, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 import SearchBox from "../SearchBox/SearchBox";
 import NoteList from "../NoteList/NoteList";
@@ -9,9 +9,8 @@ import Pagination from "../Pagination/Pagination";
 import NoteModal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 
-import { deleteNote, fetchNotes} from "../../services/noteService";
+import { fetchNotes} from "../../services/noteService";
 import { useDebounce } from "use-debounce";
-import type { Note } from "../../types/note";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
@@ -26,8 +25,6 @@ const useToggle = () => {
 };
 
 export default function App() {
-
-  const queryClient = useQueryClient();
   const { isOpen, open, close } = useToggle();
   const [ searchTerm, setSearchTerm ] = useState<string>("");
   const [debouncedSearch] = useDebounce(searchTerm, 600);
@@ -42,25 +39,9 @@ export default function App() {
   const notes = data?.results ?? [];
   const totalPages = data?.total_pages ?? 1;
 
-  
-  const deleteNoteMutation = useMutation({
-    mutationFn: deleteNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] });
-      toast.success("🗑 Note deleted!");
-    },
-    onError: () => toast.error("❌ Failed to delete note."),
-  });
-
-  const handleDeleteNote = (id: string) => {
-    deleteNoteMutation.mutate(id);
+  const handleCreateNote = () => {
+    close();
   };
-
-
-  const handleSelectNote = (note: Note) => {
-    console.log("Selected note:", note);
-  };
-
 
   return (
     <div className={css.app}>
@@ -72,7 +53,7 @@ export default function App() {
           <Pagination
               totalPages={totalPages}
               currentPage={currentPage}
-              onPageChange={(page) => setCurrentPage(page)}
+              onPageChange={setCurrentPage}
             />
 )}
         <button className={css.button} onClick={open}>
@@ -86,17 +67,15 @@ export default function App() {
 
         {!isLoading && notes.length > 0 ? (
         
-            <NoteList notes={notes}
-              onSelect={handleSelectNote}
-              onDelete={handleDeleteNote} />
+            <NoteList notes={notes} />
         ) : (
           !isLoading && <p className={css.empty}>No notes found.</p>
         )}
       </main>
 
       {isOpen && (
-        <NoteModal onClose={close}>
-          <NoteForm onClose={close} onSuccess={close }/>
+        <NoteModal open={ isOpen } onClose={close}>
+          <NoteForm onClose={close} onSuccess={ handleCreateNote }/>
         </NoteModal>
       )}
 

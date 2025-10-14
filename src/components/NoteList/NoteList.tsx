@@ -1,63 +1,29 @@
 import css from "../NoteList/NoteList.module.css";
-import type { Note, NoteUpdateData } from "../../types/note";
+import type { Note } from "../../types/note";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateNote, deleteNote } from "../../services/noteService";
+import { deleteNote } from "../../services/noteService";
 
-interface NoteProps{
+interface NoteListProps{
   notes: Note[];
-  onSelect: (note: Note) => void;
-  onDelete: (id: string) => void;
 }
 
-export default function NoteList({ notes, onSelect }: NoteProps) {
+export default function NoteList({ notes}: NoteListProps) {
 
-  const quertClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const deleteNoteMutation = useMutation({
     mutationFn: (id: string) => deleteNote(id),
-    onSuccess() {
-      quertClient.invalidateQueries({
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["notes"],
       });
     },
   });
 
-  const updateNoteMutation = useMutation({
-    mutationFn: (updatedNote: NoteUpdateData) => updateNote(updatedNote),
-    onSuccess() {
-      quertClient.invalidateQueries({ queryKey: ["notes"] });
-        
-    },
-  });
-
-
-  const handleUpdate = (note: Note) => {
-    updateNoteMutation.mutate({
-     id: note.id,
-    title: note.title,
-    content: note.content,
-    tag: note.tag,
-
-    })
-  }
- if (!notes?.length) {
-    return <p>No notes found</p>;
-  }
-
   return (
     <ul className={css.list}>
       {notes.map((note) => (
-        <li key={note.id} className={css.listItem} onClick={() => onSelect(note)}>
-          <input
-            type="checkbox"
-            defaultChecked={!note.content}
-            className={css.checkbox}
-            onChange={() => handleUpdate(note)}
-                      name="query"
-                      autoComplete="off"
-                      placeholder="Update notes..."
-                      autoFocus
-          />
+        <li key={note.id} className={css.listItem} >
           <h2 className={css.title}>{note.title}</h2>
           <p className={css.content}>{note.content}</p>
           <div className={css.footer}>

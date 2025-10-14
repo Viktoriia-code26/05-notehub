@@ -1,17 +1,17 @@
 import axios from "axios";
-import type { Note, NoteUpdateData, NewNoteData } from "../types/note";
+import type { Note, NewNoteData } from "../types/note";
 
 export interface NoteHttpResponse {
   results: Note[];
   page: number;
   total_pages: number;
   total_results: number;
-  query?: string;
-  currentPage?: number;
-  perPage?: number;
 }
-
-
+export interface ApiNoteResponse {
+  notes: Note[];
+  totalPages: number;
+  totalResults: number;
+}
 const token = import.meta.env.VITE_NOTEHUB_TOKEN;
 const BASE_URL = "https://notehub-public.goit.study/api/notes";
 
@@ -24,7 +24,7 @@ export async function fetchNotes({
     currentPage?: number;
 }): Promise<NoteHttpResponse> {
   try {
-    const response = await axios.get(BASE_URL, {
+    const response = await axios.get<ApiNoteResponse>(BASE_URL, {
       params: {
         search: query || undefined,
         page: currentPage,
@@ -39,13 +39,10 @@ export async function fetchNotes({
     const apiData = response.data;
 
     return {
-      results: apiData.notes || [],
+      results: apiData.notes,
       page: currentPage,
-      total_pages: apiData.totalPages || apiData.total_pages || 1,
-      total_results:
-        apiData.totalResults ||
-        apiData.total_results ||
-        apiData.notes?.length || 0,
+      total_pages: apiData.totalPages,
+      total_results: apiData.totalResults,
     };
   } catch (error) {
     console.error("❌ Error fetching notes:", error);
@@ -68,9 +65,8 @@ export async function createNote(newNoteData: NewNoteData): Promise<Note> {
   return response.data;
 }
 
-
 export async function deleteNote(id: string): Promise<{ id: string }> {
-  const response = await axios.delete<{ id: string }>(`${BASE_URL}/${id}`, {
+  const response = await axios.delete< Note >(`${BASE_URL}/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
@@ -79,13 +75,3 @@ export async function deleteNote(id: string): Promise<{ id: string }> {
   return response.data;
 }
 
-export async function updateNote(noteUpdateData: NoteUpdateData): Promise<Note> {
-  const { id, ...dataForUpdate } = noteUpdateData;
-  const response = await axios.put<Note>(`${BASE_URL}/${id}`, dataForUpdate, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    },
-  });
-  return response.data;
-}

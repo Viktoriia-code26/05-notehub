@@ -10,15 +10,19 @@ import type { NewNoteData } from "../../types/note";
   onClose: () => void;
 }
 
+const allTags = ["Todo", "Work", "Personal", " Meeting", "Shoping"] as const;
+
 const validationSchema = Yup.object({
   title: Yup.string()
     .min(3, "Title must be at least 3 characters")
-    .max(50, "Title must be at less 50 characters")
+    .max(50, "Title must be at most 50 characters")
     .required("Title is required"),
   content: Yup.string()
     .max(500, "Content must be at max 500 characters")
-    .required("Content is required"),
-  tag: Yup.string().required("Please select a tag"),
+    .optional(),
+  tag: Yup.string()
+    .oneOf([...allTags], "Invalid tag selected")
+    .required("Please select a tag"),
 });
 
 export default function NoteForm({ onSuccess, onClose }: NoteFormProps) {
@@ -31,25 +35,18 @@ export default function NoteForm({ onSuccess, onClose }: NoteFormProps) {
       onSuccess();
     },
   });
-  const handleSubmit = (formData: FormData) => {
-    mutate({
-      content: formData.get("content") as string,
-      title: "",
-      tag: ""
-    });
-  };
+
   return (
     <Formik
       initialValues={{ title: "", content: "", tag: "Todo" }}
       validationSchema={validationSchema}
       onSubmit={(values, { resetForm }) => {
-        mutate(values, {
-          onSuccess: () => resetForm(),
-        });
+        mutate(values);
+        resetForm();
       }}
     >
       {({ isSubmitting }) => (
-        <Form className={css.form} action={handleSubmit} >
+        <Form className={css.form} >
           <div className={css.formGroup}>
             <label htmlFor="title">Title</label>
             <Field id="title" name="title" className={css.input} />
@@ -57,7 +54,7 @@ export default function NoteForm({ onSuccess, onClose }: NoteFormProps) {
           </div>
 
           <div className={css.formGroup}>
-            <label htmlFor="content">Content</label>
+            <label htmlFor="content">Content(optional)</label>
             <Field as="textarea" id="content" name="content" rows={8} className={css.textarea} />
             <ErrorMessage name="content" component="span" className={css.error} />
           </div>
@@ -65,11 +62,9 @@ export default function NoteForm({ onSuccess, onClose }: NoteFormProps) {
           <div className={css.formGroup}>
             <label htmlFor="tag">Tag</label>
             <Field as="select" id="tag" name="tag" className={css.select}>
-              <option value="Todo">Todo</option>
-              <option value="Work">Work</option>
-              <option value="Personal">Personal</option>
-              <option value="Meeting">Meeting</option>
-              <option value="Shopping">Shopping</option>
+              {allTags.map((tag) => (
+                <option key={tag} value={tag}>{ tag }</option>
+              ))}
             </Field>
             <ErrorMessage name="tag" component="span" className={css.error} />
           </div>
