@@ -36,8 +36,8 @@ export default function App() {
     placeholderData: keepPreviousData,
   });
 
-  const notes = data?.results ?? [];
-  const totalPages = data?.total_pages ?? 1;
+  const notes = data?.notes ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   const handleCreateNote = () => {
     close();
