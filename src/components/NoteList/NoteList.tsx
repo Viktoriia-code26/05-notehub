@@ -18,6 +18,9 @@ export default function NoteList({ notes}: NoteListProps) {
         queryKey: ["notes"],
       });
     },
+    onError: (error) => {
+      console.error("Error deleting note:", error);
+    },
   });
 
   return (
@@ -32,8 +35,9 @@ export default function NoteList({ notes}: NoteListProps) {
               type="button"
               onClick={() => deleteNoteMutation.mutate(note.id)}
               className={css.button}
+              disabled={deleteNoteMutation.isPending}
             >
-              Delete
+              {deleteNoteMutation.isPending ? "Deleting..." : "Delete"}
             </button>
           </div>
         </li>

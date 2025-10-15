@@ -10,7 +10,7 @@ import type { NewNoteData } from "../../types/note";
   onClose: () => void;
 }
 
-const allTags = ["Todo", "Work", "Personal", " Meeting", "Shoping"] as const;
+const allTags = ["Todo", "Work", "Personal", "Meeting", "Shopping"] as const;
 
 const validationSchema = Yup.object({
   title: Yup.string()
