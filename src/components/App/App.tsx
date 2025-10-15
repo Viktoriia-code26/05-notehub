@@ -30,6 +30,11 @@ export default function App() {
   const [debouncedSearch] = useDebounce(searchTerm, 600);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const handleSearch = (query: string) => {
+    setSearchTerm(query);
+    setCurrentPage(1);
+  };
+
   const { data, isLoading, error, isFetching } = useQuery({
     queryKey: ["notes", debouncedSearch, currentPage],
     queryFn: () => fetchNotes({ query: debouncedSearch, currentPage }),
@@ -47,7 +52,7 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
      
-        <SearchBox onSearch={setSearchTerm} searchQuery={searchTerm} />
+        <SearchBox onSearch={handleSearch} searchQuery={searchTerm} />
         
          { totalPages > 1 && notes.length > 0 && (
           <Pagination
